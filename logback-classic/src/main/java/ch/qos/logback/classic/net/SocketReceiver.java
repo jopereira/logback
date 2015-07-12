@@ -54,6 +54,7 @@ public class SocketReceiver extends ReceiverBase
   private String receiverId;
   private volatile Socket socket;
   private Future<Socket> connectorTask;
+  private ObjectReaderFactory objectReaderFactory;
 
   /**
    * {@inheritDoc}
@@ -86,6 +87,8 @@ public class SocketReceiver extends ReceiverBase
     }
 
     if (errorCount == 0) {
+      objectReaderFactory = createObjectReaderFactory();
+
       receiverId = "receiver " + remoteHost + ":" + port + ": ";
     }
 
@@ -160,11 +163,11 @@ public class SocketReceiver extends ReceiverBase
   private void dispatchEvents(LoggerContext lc) {
     try {
       socket.setSoTimeout(acceptConnectionTimeout);
-      ObjectInputStream ois = new ObjectInputStream(socket.getInputStream());
+      ObjectReader ois = objectReaderFactory.newObjectReader(socket.getInputStream());
       socket.setSoTimeout(0);
       addInfo(receiverId + "connection established");
       while (true) {
-        ILoggingEvent event = (ILoggingEvent) ois.readObject();
+        ILoggingEvent event = (ILoggingEvent) ois.read();
         Logger remoteLogger = lc.getLogger(event.getLoggerName());
         if (remoteLogger.isEnabledFor(event.getLevel())) {
           remoteLogger.callAppenders(event);
@@ -204,6 +207,10 @@ public class SocketReceiver extends ReceiverBase
 
   protected SocketFactory getSocketFactory() {
     return SocketFactory.getDefault();
+  }
+  
+  protected ObjectReaderFactory createObjectReaderFactory() {
+	  return new ObjectReaderFactory();
   }
 
   public void setRemoteHost(String remoteHost) {

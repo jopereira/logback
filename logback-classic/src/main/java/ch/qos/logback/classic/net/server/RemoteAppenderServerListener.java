@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 
+import ch.qos.logback.classic.net.ObjectReaderFactory;
 import ch.qos.logback.core.net.server.ServerListener;
 import ch.qos.logback.core.net.server.ServerSocketListener;
 
@@ -28,13 +29,16 @@ import ch.qos.logback.core.net.server.ServerSocketListener;
 class RemoteAppenderServerListener
     extends ServerSocketListener<RemoteAppenderClient>  {
 
+  private ObjectReaderFactory objectReaderFactory;
+	
   /**
    * Constructs a new listener.
    * @param serverSocket the {@link ServerSocket} from which to accept
    *    new client connections
    */
-  public RemoteAppenderServerListener(ServerSocket serverSocket) {
+  public RemoteAppenderServerListener(ServerSocket serverSocket, ObjectReaderFactory objectReaderFactory) {
     super(serverSocket);
+    this.objectReaderFactory = objectReaderFactory;
   }
 
   /**
@@ -43,7 +47,7 @@ class RemoteAppenderServerListener
   @Override
   protected RemoteAppenderClient createClient(String id, Socket socket) 
       throws IOException {
-    return new RemoteAppenderStreamClient(id, socket);
+    return new RemoteAppenderStreamClient(id, socket, objectReaderFactory);
   }
 
 }

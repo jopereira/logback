@@ -20,6 +20,7 @@ import java.util.concurrent.Executor;
 
 import javax.net.ServerSocketFactory;
 
+import ch.qos.logback.classic.net.ObjectReaderFactory;
 import ch.qos.logback.classic.net.server.RemoteAppenderClient;
 import ch.qos.logback.classic.net.server.RemoteAppenderServerListener;
 import ch.qos.logback.classic.net.server.ServerSocketReceiver;
@@ -41,7 +42,7 @@ public class InstrumentedServerSocketReceiver extends ServerSocketReceiver {
   private ServerListener lastListener;
   
   public InstrumentedServerSocketReceiver(ServerSocket serverSocket) {
-    this(serverSocket, new RemoteAppenderServerListener(serverSocket), null);
+    this(serverSocket, new RemoteAppenderServerListener(serverSocket, new ObjectReaderFactory()), null);
   }
   
   public InstrumentedServerSocketReceiver(ServerSocket serverSocket,

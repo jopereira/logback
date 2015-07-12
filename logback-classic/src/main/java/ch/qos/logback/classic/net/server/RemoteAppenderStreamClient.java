@@ -16,11 +16,12 @@ package ch.qos.logback.classic.net.server;
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.ObjectInputStream;
 import java.net.Socket;
 
 import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.LoggerContext;
+import ch.qos.logback.classic.net.ObjectReader;
+import ch.qos.logback.classic.net.ObjectReaderFactory;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.util.CloseUtil;
 
@@ -39,15 +40,18 @@ class RemoteAppenderStreamClient implements RemoteAppenderClient {
   private LoggerContext lc;
   private Logger logger;
   
+  private ObjectReaderFactory objectReaderFactory;
+  
   /**
    * Constructs a new client.  
    * @param id a display name for the client
    * @param inputStream input stream from which events will be read
    */
-  public RemoteAppenderStreamClient(String id, Socket socket) {
+  public RemoteAppenderStreamClient(String id, Socket socket, ObjectReaderFactory objectReaderFactory) {
     this.id = id;
     this.socket = socket;
     this.inputStream = null;
+    this.objectReaderFactory = objectReaderFactory;
   }
 
   /**
@@ -59,10 +63,11 @@ class RemoteAppenderStreamClient implements RemoteAppenderClient {
    * @param id a display name for the client
    * @param inputStream input stream from which events will be read
    */
-  public RemoteAppenderStreamClient(String id, InputStream inputStream) {
+  public RemoteAppenderStreamClient(String id, InputStream inputStream, ObjectReaderFactory objectReaderFactory) {
     this.id = id;
     this.socket = null;
     this.inputStream = inputStream;
+    this.objectReaderFactory = objectReaderFactory;
   }
 
   /**
@@ -86,12 +91,12 @@ class RemoteAppenderStreamClient implements RemoteAppenderClient {
    */
   public void run() {
     logger.info(this + ": connected"); 
-    ObjectInputStream ois = null;
+    ObjectReader or = null;
     try {
-      ois = createObjectInputStream();
+      or = createObjectReader();
       while (true) {
         // read an event from the wire
-        ILoggingEvent event = (ILoggingEvent) ois.readObject();
+        ILoggingEvent event = (ILoggingEvent) or.read();
         // get a logger from the hierarchy. The name of the logger is taken to
         // be the name contained in the event.
         Logger remoteLogger = lc.getLogger(event.getLoggerName());
@@ -116,19 +121,19 @@ class RemoteAppenderStreamClient implements RemoteAppenderClient {
       logger.error(this + ": " + ex);
     }
     finally {
-      if (ois != null) {
-        CloseUtil.closeQuietly(ois);
+      if (or != null) {
+        CloseUtil.closeQuietly(or);
       }
       close();
       logger.info(this + ": connection closed");
     }
   }
 
-  private ObjectInputStream createObjectInputStream() throws IOException {
+  private ObjectReader createObjectReader() throws IOException {
     if (inputStream != null) {
-      return new ObjectInputStream(inputStream);
+      return objectReaderFactory.newObjectReader(inputStream);
     }
-    return new ObjectInputStream(socket.getInputStream());
+    return objectReaderFactory.newObjectReader(socket.getInputStream());
   }
   
   /**
