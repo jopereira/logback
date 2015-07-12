@@ -22,6 +22,8 @@ import java.net.SocketException;
 import java.util.concurrent.BlockingQueue;
 
 import ch.qos.logback.core.CoreConstants;
+import ch.qos.logback.core.net.ObjectWriter;
+import ch.qos.logback.core.net.ObjectWriterFactory;
 import ch.qos.logback.core.spi.ContextAwareBase;
 import ch.qos.logback.core.util.CloseUtil;
 
@@ -40,15 +42,18 @@ class RemoteReceiverStreamClient
   
   private BlockingQueue<Serializable> queue;
   
+  private ObjectWriterFactory objectWriterFactory;
+  
   /**
    * Constructs a new client.
    * @param id identifier string for the client
    * @param socket socket to which logging events will be written
    */
-  public RemoteReceiverStreamClient(String id, Socket socket) {
+  public RemoteReceiverStreamClient(String id, Socket socket, ObjectWriterFactory objectWriterFactory) {
     this.clientId = "client " + id + ": ";
     this.socket = socket;
     this.outputStream = null;
+    this.objectWriterFactory = objectWriterFactory;
   }
 
   /**
@@ -60,10 +65,11 @@ class RemoteReceiverStreamClient
    * @param id identifier string for the client
    * @param outputStream output stream to which logging Events will be written
    */
-  RemoteReceiverStreamClient(String id, OutputStream outputStream) {
+  RemoteReceiverStreamClient(String id, OutputStream outputStream, ObjectWriterFactory objectWriterFactory) {
     this.clientId = "client " + id + ": ";
     this.socket = null;
     this.outputStream = outputStream;
+    this.objectWriterFactory = objectWriterFactory;
   }
   
   /**
@@ -97,21 +103,13 @@ class RemoteReceiverStreamClient
   public void run() {  
     addInfo(clientId + "connected"); 
 
-    ObjectOutputStream oos = null;
+    ObjectWriter ow = null;
     try {
-      int counter = 0;
-      oos = createObjectOutputStream();
+      ow = createObjectWriter();
       while (!Thread.currentThread().isInterrupted()) {
         try {
           Serializable event = queue.take();
-          oos.writeObject(event);
-          oos.flush();
-          if (++counter >= CoreConstants.OOS_RESET_FREQUENCY) {
-            // failing to reset the stream periodically will result in a
-            // serious memory leak (as noted in AbstractSocketAppender)
-            counter = 0;
-            oos.reset();
-          }
+          ow.write(event);
         }
         catch (InterruptedException ex) {
           Thread.currentThread().interrupt();
@@ -128,18 +126,18 @@ class RemoteReceiverStreamClient
       addError(clientId + ex);
     }
     finally {
-      if (oos != null) {
-        CloseUtil.closeQuietly(oos);
+      if (ow != null) {
+        CloseUtil.closeQuietly(ow);
       }
       close();
       addInfo(clientId + "connection closed");
     }
   }
 
-  private ObjectOutputStream createObjectOutputStream() throws IOException {
+  private ObjectWriter createObjectWriter() throws IOException {
     if (socket == null) {
-      return new ObjectOutputStream(outputStream);
+      return objectWriterFactory.newObjectWriter(outputStream);
     }
-    return new ObjectOutputStream(socket.getOutputStream());
+    return objectWriterFactory.newObjectWriter(socket.getOutputStream());
   }
 }

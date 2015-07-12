@@ -100,7 +100,7 @@ public abstract class AbstractSocketAppender<E> extends AppenderBase<E>
   /**
    * Constructs a new appender using the given {@link QueueFactory} and {@link ObjectWriterFactory}.
    */
-  AbstractSocketAppender(QueueFactory queueFactory, ObjectWriterFactory objectWriterFactory) {
+  protected AbstractSocketAppender(QueueFactory queueFactory, ObjectWriterFactory objectWriterFactory) {
     this.objectWriterFactory = objectWriterFactory;
     this.queueFactory = queueFactory;
   }
@@ -212,7 +212,7 @@ public abstract class AbstractSocketAppender<E> extends AppenderBase<E>
 
   private ObjectWriter createObjectWriterForSocket() throws IOException {
     socket.setSoTimeout(acceptConnectionTimeout);
-    ObjectWriter objectWriter = objectWriterFactory.newAutoFlushingObjectWriter(socket.getOutputStream());
+    ObjectWriter objectWriter = objectWriterFactory.newObjectWriter(socket.getOutputStream());
     socket.setSoTimeout(0);
     return objectWriter;
   }

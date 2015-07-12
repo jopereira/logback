@@ -17,6 +17,8 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 
+import ch.qos.logback.core.net.ObjectWriterFactory;
+
 /**
  * A {@link ServerListener} that accepts connections from remote receiver
  * component clients.
@@ -26,13 +28,16 @@ import java.net.Socket;
 class RemoteReceiverServerListener
     extends ServerSocketListener<RemoteReceiverClient> {
 
-  /**
+  private ObjectWriterFactory objectWriterFactory;
+
+/**
    * Constructs a new listener.
    * @param serverSocket server socket from which new client connections
    *    will be accepted
    */
-  public RemoteReceiverServerListener(ServerSocket serverSocket) {
+  public RemoteReceiverServerListener(ServerSocket serverSocket, ObjectWriterFactory objectWriterFactory) {
     super(serverSocket);
+    this.objectWriterFactory = objectWriterFactory;
   }
 
   /**
@@ -41,7 +46,7 @@ class RemoteReceiverServerListener
   @Override
   protected RemoteReceiverClient createClient(String id, Socket socket)
       throws IOException {
-    return new RemoteReceiverStreamClient(id, socket);
+    return new RemoteReceiverStreamClient(id, socket, objectWriterFactory);
   }
 
 }

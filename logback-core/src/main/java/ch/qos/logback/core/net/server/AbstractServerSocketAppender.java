@@ -24,6 +24,7 @@ import javax.net.ServerSocketFactory;
 
 import ch.qos.logback.core.AppenderBase;
 import ch.qos.logback.core.net.AbstractSocketAppender;
+import ch.qos.logback.core.net.ObjectWriterFactory;
 import ch.qos.logback.core.spi.PreSerializationTransformer;
 
 /**
@@ -72,7 +73,7 @@ public abstract class AbstractServerSocketAppender<E> extends AppenderBase<E> {
   
   protected ServerListener<RemoteReceiverClient> createServerListener(
       ServerSocket socket) {
-    return new RemoteReceiverServerListener(socket);
+    return new RemoteReceiverServerListener(socket, createObjectWriterFactory());
   }
   
   protected ServerRunner<RemoteReceiverClient> createServerRunner(
@@ -80,6 +81,10 @@ public abstract class AbstractServerSocketAppender<E> extends AppenderBase<E> {
       Executor executor) {
     return new RemoteReceiverServerRunner(listener, executor, 
         getClientQueueSize());
+  }
+  
+  protected ObjectWriterFactory createObjectWriterFactory() {
+	  return new ObjectWriterFactory();
   }
   
   @Override

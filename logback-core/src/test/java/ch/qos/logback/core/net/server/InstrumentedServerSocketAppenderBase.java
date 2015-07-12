@@ -21,6 +21,7 @@ import java.util.concurrent.Executor;
 
 import javax.net.ServerSocketFactory;
 
+import ch.qos.logback.core.net.ObjectWriterFactory;
 import ch.qos.logback.core.spi.PreSerializationTransformer;
 
 /**
@@ -38,7 +39,7 @@ public class InstrumentedServerSocketAppenderBase
   private ServerListener lastListener;
   
   public InstrumentedServerSocketAppenderBase(ServerSocket serverSocket) {
-    this(serverSocket, new RemoteReceiverServerListener(serverSocket), null);
+    this(serverSocket, new RemoteReceiverServerListener(serverSocket, new ObjectWriterFactory()), null);
   }
   
   public InstrumentedServerSocketAppenderBase(ServerSocket serverSocket,

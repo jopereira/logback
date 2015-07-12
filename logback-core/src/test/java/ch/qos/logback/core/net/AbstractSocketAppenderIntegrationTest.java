@@ -52,7 +52,7 @@ public class AbstractSocketAppenderIntegrationTest {
 
   private ThreadPoolExecutor executorService = (ThreadPoolExecutor) Executors.newCachedThreadPool();
   private MockContext mockContext = new MockContext(executorService);
-  private AutoFlushingObjectWriter objectWriter;
+  private ObjectWriter objectWriter;
   private ObjectWriterFactory objectWriterFactory = new SpyProducingObjectWriterFactory();
   private LinkedBlockingDeque<String> deque = spy(new LinkedBlockingDeque<String>(1));
   private QueueFactory queueFactory = mock(QueueFactory.class);
@@ -120,8 +120,8 @@ public class AbstractSocketAppenderIntegrationTest {
   private class SpyProducingObjectWriterFactory extends ObjectWriterFactory {
 
     @Override
-    public AutoFlushingObjectWriter newAutoFlushingObjectWriter(OutputStream outputStream) throws IOException {
-      objectWriter = spy(super.newAutoFlushingObjectWriter(outputStream));
+    public ObjectWriter newObjectWriter(OutputStream outputStream) throws IOException {
+      objectWriter = spy(super.newObjectWriter(outputStream));
       return objectWriter;
     }
   }

@@ -23,6 +23,7 @@ import java.io.ObjectInputStream;
 import org.junit.Before;
 import org.junit.Test;
 
+import ch.qos.logback.core.net.ObjectWriterFactory;
 import ch.qos.logback.core.net.mock.MockContext;
 
 
@@ -43,7 +44,7 @@ public class RemoteReceiverStreamClientTest {
       new ByteArrayOutputStream();
   
   private RemoteReceiverStreamClient client = 
-      new RemoteReceiverStreamClient("someId", outputStream);
+      new RemoteReceiverStreamClient("someId", outputStream, new ObjectWriterFactory());
   
   @Before
   public void setUp() throws Exception {

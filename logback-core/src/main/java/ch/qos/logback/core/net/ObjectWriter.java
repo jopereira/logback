@@ -13,6 +13,7 @@
  */
 package ch.qos.logback.core.net;
 
+import java.io.Closeable;
 import java.io.IOException;
 
 /**
@@ -20,7 +21,7 @@ import java.io.IOException;
  *
  * @author Sebastian Gr&ouml;bler
  */
-public interface ObjectWriter {
+public interface ObjectWriter extends Closeable {
 
   /**
    * Writes an object to an output.

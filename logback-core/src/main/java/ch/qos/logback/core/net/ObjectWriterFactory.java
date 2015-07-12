@@ -33,7 +33,7 @@ public class ObjectWriterFactory {
    * @return a new {@link ch.qos.logback.core.net.AutoFlushingObjectWriter} instance
    * @throws IOException if an I/O error occurs while writing stream header
    */
-  public AutoFlushingObjectWriter newAutoFlushingObjectWriter(OutputStream outputStream) throws IOException {
+  public ObjectWriter newObjectWriter(OutputStream outputStream) throws IOException {
     return new AutoFlushingObjectWriter(new ObjectOutputStream(outputStream), CoreConstants.OOS_RESET_FREQUENCY);
   }
 }

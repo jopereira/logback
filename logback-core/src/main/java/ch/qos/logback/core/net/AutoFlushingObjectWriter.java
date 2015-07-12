@@ -57,4 +57,11 @@ public class AutoFlushingObjectWriter implements ObjectWriter {
       writeCounter = 0;
     }
   }
+  
+  /**
+   * {@inheritDoc}
+   */
+  public void close() throws IOException {
+	  objectOutputStream.close();
+  }
 }

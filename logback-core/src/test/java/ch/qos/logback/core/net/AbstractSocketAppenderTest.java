@@ -77,7 +77,7 @@ public class AbstractSocketAppenderTest {
   @Before
   public void setupValidAppenderWithMockDependencies() throws Exception {
 
-    doReturn(objectWriter).when(objectWriterFactory).newAutoFlushingObjectWriter(any(OutputStream.class));
+    doReturn(objectWriter).when(objectWriterFactory).newObjectWriter(any(OutputStream.class));
     doReturn(deque).when(queueFactory).<String>newLinkedBlockingDeque(anyInt());
 
     appender.setContext(mockContext);
@@ -204,7 +204,7 @@ public class AbstractSocketAppenderTest {
 
     // given
     mockOneSuccessfulSocketConnection();
-    doThrow(new IOException()).when(objectWriterFactory).newAutoFlushingObjectWriter(any(OutputStream.class));
+    doThrow(new IOException()).when(objectWriterFactory).newObjectWriter(any(OutputStream.class));
     appender.start();
 
     // when
@@ -219,7 +219,7 @@ public class AbstractSocketAppenderTest {
 
     // given
     mockOneSuccessfulSocketConnection();
-    doThrow(new IOException()).when(objectWriterFactory).newAutoFlushingObjectWriter(any(OutputStream.class));
+    doThrow(new IOException()).when(objectWriterFactory).newObjectWriter(any(OutputStream.class));
     appender.start();
 
     // when
@@ -234,7 +234,7 @@ public class AbstractSocketAppenderTest {
 
     // given
     mockOneSuccessfulSocketConnection();
-    doThrow(new IOException()).when(objectWriterFactory).newAutoFlushingObjectWriter(any(OutputStream.class));
+    doThrow(new IOException()).when(objectWriterFactory).newObjectWriter(any(OutputStream.class));
     appender.start();
 
     // when
@@ -438,7 +438,7 @@ public class AbstractSocketAppenderTest {
     appender.append("some event");
 
     // then
-    verify(objectWriterFactory, timeout(TIMEOUT).atLeast(2)).newAutoFlushingObjectWriter(any(OutputStream.class));
+    verify(objectWriterFactory, timeout(TIMEOUT).atLeast(2)).newObjectWriter(any(OutputStream.class));
   }
 
   @Test
