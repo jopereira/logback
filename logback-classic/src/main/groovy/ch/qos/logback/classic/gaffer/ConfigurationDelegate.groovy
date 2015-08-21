@@ -148,7 +148,7 @@ public class ConfigurationDelegate extends ContextAwareBase {
   }
 
   void receiver(String name, Class aClass, Closure closure = null) {
-    addInfo("About to instantiate receiver of type [" + clazz.name + "]");
+    addInfo("About to instantiate receiver of type [" + aClass.name + "]");
     ReceiverBase receiver = aClass.newInstance();
     receiver.context = context;
     if(closure != null) {
